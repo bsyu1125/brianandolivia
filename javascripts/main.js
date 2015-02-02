@@ -222,3 +222,26 @@ function addRowBrian() {
 		  }
 	});
 }
+function addRowOlivia() {
+	// Create the object.
+	var newItem = Parse.Object.extend("wishlist");
+	var item = new newItem();
+	
+	item.set("Description", $("#olivia_desc").val());
+	item.set("URL", $("#olivia_url").val());
+	item.set("For", "Olivia");
+	item.set("Need", parseInt($("#olivia_need").val()));
+
+
+	item.save(null, {
+		success: function(response) {
+			console.log("new created object");
+			updateTableOlivia();
+		},
+		error: function(gameScore, error) {
+		    // Execute any logic that should take place if the save fails.
+		    // error is a Parse.Error with an error code and message.
+		    alert('Failed to create new object, with error code: ' + error.message);
+		  }
+	});
+}
