@@ -4,33 +4,31 @@ function initParse() {
 	Parse.initialize("dQVhd2C0XZucdG7Amm767FDW1Ri1sXlK59A8twon", "SOXzgEhvZfr8EhAO7hXlyft4s61lRo8K4IMb02TU");
 }
 
+// Sets rows for that person
+// Given the results, it recreates the table
+// With a large scale of data, I think it will take a while and would have to be changed, but our wishlist shouldn't be too huge
 function setRows(results, person) {
 
+	// Creates the item to be put into a collection
+	// initialize is kind of like a listener, when something changes, we have to update the row
 	var Item = Backbone.Model.extend({
       	initialize: function () {
 		    Backbone.Model.prototype.initialize.apply(this, arguments);
-
 		    this.on("change", function (model, options) {
-		    	console.log("changed?");
-		    	console.log(this);
-		    	console.log(this.previous("description"));
-		    	console.log("updating row?");
-
 		    	updateRow(person, this);
-
 			    if (options && options.save === false) return;
 			      model.save();
 			    });
 		  }
     });
 
-
+	// The collection
     var ItemCollection = Backbone.Collection.extend({
         model: Item
     });	
 
+    // Given the results, create a collection and stick it into an array
     var itemArray = [];
-
     for (var i = 0; i < results.length; i++) {
 
 	    var t = new Item({
@@ -40,42 +38,45 @@ function setRows(results, person) {
 	    });
 	    itemArray.push(t);
 	}
-	// console.log("array");
-	console.log(itemArray);
 
 	var items = new ItemCollection(itemArray);
-
+	// Creates the delete cell (the last column)
 	var DeleteCell = Backgrid.Cell.extend({
 	    template: _.template('<button>Delete</button>'),
 	    events: {
 	      "click": "deleteRow"
 	    },
 	    deleteRow: function (e) {
-	      var flag = confirm("Are you sure you want to delete that?");
-	      if (flag == true) {
-	      	e.preventDefault();
 
-	      	var items = Parse.Object.extend("wishlist");
-			var query = new Parse.Query(items);
-			query.equalTo("Description", this.model.get("description"));
-			query.equalTo("URL", this.model.get("url"));
-			query.find({
-				success: function(object) {
-					object[0].destroy({
-						success: function(obj) {
-							console.log("Deleted");
-						},
-						error: function(obj) {	
-							console.log("Not deleted");
-						}
-					});
-				},
-				error: function(error) {
-					console.log("Couldn't find to delete");
-				}
-			})
-	      	this.model.collection.remove(this.model);
-	      }
+	    	// Prompts user for confirmation
+	      	var flag = confirm("Are you sure you want to delete that?");
+	      	if (flag == true) {
+	      		e.preventDefault();
+
+	      		// Queries for the item and deletes it
+		      	var items = Parse.Object.extend("wishlist");
+				var query = new Parse.Query(items);
+				query.equalTo("Description", this.model.get("description"));
+				query.equalTo("URL", this.model.get("url"));
+
+				// Finds and destroys it
+				query.find({
+					success: function(object) {
+						object[0].destroy({
+							success: function(obj) {
+								console.log("Deleted");
+							},
+							error: function(obj) {	
+								console.log("Not deleted");
+							}
+						});
+					},
+					error: function(error) {
+						console.log("Couldn't find to delete");
+					}
+				})
+		      	this.model.collection.remove(this.model);
+		      }
 	    },
 	    render: function () {
 	      this.$el.html(this.template());
@@ -83,7 +84,7 @@ function setRows(results, person) {
 	      return this;
 	    }
 	});
-
+	// Creates columns for the table
 	var columns = [{
 	  name: "description",
 	  label: "Description/Details",
@@ -123,9 +124,9 @@ function setRows(results, person) {
 function showTable() {
 	updateTableBrian();
 	updateTableOlivia();
-	
 }
 
+// Update
 function updateTableBrian() {
 	$("#brians_grid").empty();
 	var item = Parse.Object.extend("wishlist");
@@ -216,7 +217,6 @@ function updateRow(person, model) {
 	var newItem = Parse.Object.extend("wishlist");
 	var item = new Parse.Query(newItem);
 	
-	console.log(model.previous("description"));
 	item.equalTo("Description", model.previous("description"));
 	item.equalTo("URL", model.previous("url"));
 	item.equalTo("Need", model.previous("need"));
@@ -224,8 +224,7 @@ function updateRow(person, model) {
 	console.log("updating row1");
 	item.first({
 		success: function(object) {
-			console.log("success");
-			console.log(object);
+
 			object.set("Description", model.get("description"));
 			object.set("URL", model.get("url"));
 			object.set("Need", model.get("need"));
