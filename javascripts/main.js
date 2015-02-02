@@ -9,12 +9,21 @@ function setRows(results, person) {
 	var Item = Backbone.Model.extend({
       	initialize: function () {
 		    Backbone.Model.prototype.initialize.apply(this, arguments);
+
 		    this.on("change", function (model, options) {
-		    if (options && options.save === false) return;
-		      model.save();
-		    });
+		    	console.log("changed?");
+		    	console.log(this);
+		    	console.log(this.previous("description"));
+		    	console.log("updating row?");
+
+		    	updateRow(person, this);
+
+			    if (options && options.save === false) return;
+			      model.save();
+			    });
 		  }
     });
+
 
     var ItemCollection = Backbone.Collection.extend({
         model: Item
@@ -36,21 +45,6 @@ function setRows(results, person) {
 
 	var items = new ItemCollection(itemArray);
 
-	// Suppose you want to highlight the entire row when an editable field is focused
-	var FocusableRow = Backgrid.Row.extend({
-	  highlightColor: "lightYellow",
-	  events: {
-	    focusin: "rowFocused",
-	    focusout: "rowLostFocus"
-	  },
-	  rowFocused: function() {
-	    this.el.style.backgroundColor = this.highlightColor;
-	  },
-	  rowLostFocus: function() {
-	    delete this.el.style.backgroundColor;
-	  }
-	});
-
 	var DeleteCell = Backgrid.Cell.extend({
 	    template: _.template('<button>Delete</button>'),
 	    events: {
@@ -59,9 +53,7 @@ function setRows(results, person) {
 	    deleteRow: function (e) {
 	      var flag = confirm("Are you sure you want to delete that?");
 	      if (flag == true) {
-	      	console.log(e);
 	      	e.preventDefault();
-	      	console.log(this.model);
 
 	      	var items = Parse.Object.extend("wishlist");
 			var query = new Parse.Query(items);
@@ -69,8 +61,6 @@ function setRows(results, person) {
 			query.equalTo("URL", this.model.get("url"));
 			query.find({
 				success: function(object) {
-					console.log("Found it to delete");
-					console.log(object);
 					object[0].destroy({
 						success: function(obj) {
 							console.log("Deleted");
@@ -84,9 +74,7 @@ function setRows(results, person) {
 					console.log("Couldn't find to delete");
 				}
 			})
-
 	      	this.model.collection.remove(this.model);
-
 	      }
 	    },
 	    render: function () {
@@ -118,7 +106,6 @@ function setRows(results, person) {
 
 	// Initialize a new Grid instance
 	var grid = new Backgrid.Grid({
-		row: FocusableRow,
 		columns: columns,
 		collection: items
 	});
@@ -149,14 +136,6 @@ function updateTableBrian() {
 	query.find( {
 	  success: function(results) {
 	    // The object was retrieved successfully.
-	    console.log("success");
-	    console.log(results.length);
-
-		for (var i = 0; i < results.length; i++) {
-    		var object = results[i];
-	    	console.log(object.id + ' - ' + object.get('name'));
-	    }	    
-	    console.log(results);
 	    setRows(results, "Brian");
 	  },
 	  error: function(error) {
@@ -179,15 +158,7 @@ function updateTableOlivia() {
 
 	query.find( {
 	  success: function(results) {
-	    // The object was retrieved successfully.
-	    console.log("success");
-	    console.log(results.length);
-
-		for (var i = 0; i < results.length; i++) {
-    		var object = results[i];
-	    	console.log(object.id + ' - ' + object.get('name'));
-	    }	    
-	    console.log(results);
+	    // The object was retrieved successfully.  
 	    setRows(results, "Olivia");
 	  },
 	  error: function(error) {
@@ -207,12 +178,8 @@ function addRowBrian() {
 	item.set("URL", $("#brian_url").val());
 	item.set("For", "Brian");
 	item.set("Need", parseInt($("#brian_need").val()));
-
-	console.log($("#brian_need").val());
-
 	item.save(null, {
 		success: function(response) {
-			console.log("new created object");
 			updateTableBrian();
 		},
 		error: function(gameScore, error) {
@@ -235,8 +202,44 @@ function addRowOlivia() {
 
 	item.save(null, {
 		success: function(response) {
-			console.log("new created object");
 			updateTableOlivia();
+		},
+		error: function(gameScore, error) {
+		    // Execute any logic that should take place if the save fails.
+		    // error is a Parse.Error with an error code and message.
+		    alert('Failed to create new object, with error code: ' + error.message);
+		  }
+	});
+}
+
+function updateRow(person, model) {
+	var newItem = Parse.Object.extend("wishlist");
+	var item = new Parse.Query(newItem);
+	
+	console.log(model.previous("description"));
+	item.equalTo("Description", model.previous("description"));
+	item.equalTo("URL", model.previous("url"));
+	item.equalTo("Need", model.previous("need"));
+
+	console.log("updating row1");
+	item.first({
+		success: function(object) {
+			console.log("success");
+			console.log(object);
+			object.set("Description", model.get("description"));
+			object.set("URL", model.get("url"));
+			object.set("Need", model.get("need"));
+
+			if (person == "Olivia") {
+				// object.set("For", "Olivia");
+				object.save();
+				updateTableOlivia();
+			}
+			else {
+				// object.set("For", "Brian");
+				object.save();
+				updateTableBrian();
+			}
 		},
 		error: function(gameScore, error) {
 		    // Execute any logic that should take place if the save fails.
