@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
@@ -26,7 +28,7 @@
     <title>Brian &amp; Olivia by bsyu1125</title>
   </head>
 
-  <body onload="initParse(); initTable();">
+  <body onload="initParse(); showTable(null);">
     <header>
       <div class="inner">
         <h1>Brian &amp; Olivia</h1>
@@ -39,9 +41,56 @@
 
       <div id="brians_grid" ></div>
 
+
+      <form class="addRowForm" action="printTest();">
+        <div class="col-md-3">
+          Description:<br>
+          <input id="brian_desc" class="addRow" type="text" name="Description" >
+          <br>
+        </div>
+        <div class="col-md-3">
+          URL:<br>
+          <input id="brian_url" class="addRow" type="text" name="URL">
+          <br>
+        </div>
+        <div class="col-md-3">
+          How much do you want it? (1-10):<br>
+          <input id="brian_need" class="addRow" type="text" name="Need">
+          <button class="addRow" type="button" onclick="addRowBrian();" value="Add Item">Add Row</button>
+          <br>
+        </div>
+      </form>
+
       <h2 class="listHeader"> Olivia's List </h2>
 
       <div id="olivias_grid"></div>
+
+      <form class="addRowForm">
+        <div class="col-md-3">
+          Description:<br>
+          <input class="addRow" type="text" name="Description" >
+          <br>
+        </div>
+        <div class="col-md-3">
+          URL:<br>
+          <input class="addRow" type="text" name="URL">
+          <br>
+        </div>
+        <div class="col-md-3">
+          How much do you want it? (1-10):<br>
+          <input class="addRow" type="text" name="Need">
+          <button class="addRow" type="button" value="Add Item">Add Row</button>
+          <br>
+        </div>
+      </form>
+
+    <form action="http://tinyurl.com/create.php" method="post" target="_blank">
+    <table align="center" cellpadding="5" bgcolor="#E7E7F7"><tr><td>
+    <b>Enter a long URL to make <a href="http://tinyurl.com">tiny</a>:</b><br />
+    <input type="text" name="url" size="30"><input type="submit" name="submit" value="Make TinyURL!">
+    </td></tr></table>
+    </form>
+
 
   </body>
 

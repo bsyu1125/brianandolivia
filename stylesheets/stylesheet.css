@@ -886,7 +886,7 @@ footer a:hover {
   width: 75%;
    /*you may want to adjust this to fit a whole page */
   height: auto;
-  padding-bottom: 50px;
+  padding-bottom: 25px;
   overflow: auto;
   border: 0;
   
@@ -901,14 +901,24 @@ footer a:hover {
   width: 75%;
    /*you may want to adjust this to fit a whole page */
   height: auto;
-  padding-bottom: 50px;
+  padding-bottom: 5px;
   overflow: auto;
   border: 0;
 }
 
+.addRowForm {
+  position: relative;
+  margin-left: auto;
+  margin-left: auto;
+  width: 90%;
+  padding-bottom: 50px;
+  background: #fafafa url(../images/body-bg.jpg) 0 0 repeat;
+  height: auto;
+}
 
 .listHeader {
   text-align: center;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-
 }
+
+
